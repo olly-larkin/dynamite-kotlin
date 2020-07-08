@@ -69,6 +69,8 @@ class MyBot : Bot {
         for (i in 0 until min(prevGameRev.size, currentGameRev.size)) {
             if (prevGameRev[i].p1 == currentGameRev[i].p1) total += 1
             if (prevGameRev[i].p2 == currentGameRev[i].p2) total += 1
+            // If the players draw, this could also be a part of a pattern independent of what was thrown
+            if (prevGameRev[i].p1 == prevGameRev[i].p2 && currentGameRev[i].p1 == currentGameRev[i].p2) total += 1
         }
 
         return total
