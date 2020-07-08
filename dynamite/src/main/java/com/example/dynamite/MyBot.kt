@@ -14,7 +14,7 @@ class MyBot : Bot {
         // Are you debugging?
         // Put a breakpoint in this method to see when we make a move
 
-        val historyLength = 10
+        val historyLength = 2
 
         val rounds = gamestate.rounds
 
