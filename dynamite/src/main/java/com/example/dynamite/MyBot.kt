@@ -14,7 +14,7 @@ class MyBot : Bot {
         // Are you debugging?
         // Put a breakpoint in this method to see when we make a move
 
-        val historyLength = 2
+        val historyLength = 100
 
         val rounds = gamestate.rounds
 
@@ -66,11 +66,14 @@ class MyBot : Bot {
 
         var total = 0
 
-        for (i in 0 until min(prevGameRev.size, currentGameRev.size)) {
-            if (prevGameRev[i].p1 == currentGameRev[i].p1) total += 1
-            if (prevGameRev[i].p2 == currentGameRev[i].p2) total += 1
+        val upperBound = min(prevGameRev.size, currentGameRev.size)
+
+        // Give precedence to recent values
+        for (i in 0 until upperBound) {
+            if (prevGameRev[i].p1 == currentGameRev[i].p1) total += upperBound - i
+            if (prevGameRev[i].p2 == currentGameRev[i].p2) total += upperBound - i
             // If the players draw, this could also be a part of a pattern independent of what was thrown
-            if (prevGameRev[i].p1 == prevGameRev[i].p2 && currentGameRev[i].p1 == currentGameRev[i].p2) total += 1
+            if (prevGameRev[i].p1 == prevGameRev[i].p2 && currentGameRev[i].p1 == currentGameRev[i].p2) total += upperBound - i
         }
 
         return total
