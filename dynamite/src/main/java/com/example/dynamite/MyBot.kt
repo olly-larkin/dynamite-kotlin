@@ -36,20 +36,20 @@ class MyBot : Bot {
 
         val mostLikely1 = enemyMoveProbability1.maxBy{ it.value }
         val likelyEnemyMove1 = mostLikely1?.key ?: Move.R
-        val moveScore1 = (mostLikely1?.value ?: 0.0) / enemyMoveProbability1.map{ it.value }.sum()
+        val moveScore1 = (mostLikely1?.value ?: 0.0)
 
         val mostLikely2 = enemyMoveProbability2.maxBy{ it.value }
         val likelyEnemyMove2 = mostLikely2?.key ?: Move.R
-        val moveScore2 = (mostLikely2?.value ?: 0.0) / enemyMoveProbability2.map{ it.value }.sum()
+        val moveScore2 = (mostLikely2?.value ?: 0.0)
 
         val likelyEnemyMove: Move
         val moveScore: Double
         if (moveScore1 > moveScore2) {
             likelyEnemyMove = likelyEnemyMove1
-            moveScore = moveScore1
+            moveScore = moveScore1 / enemyMoveProbability1.map{ it.value }.sum()
         } else {
             likelyEnemyMove = likelyEnemyMove2
-            moveScore = moveScore2
+            moveScore = moveScore2 / enemyMoveProbability2.map{ it.value }.sum()
         }
 
         val counterMove = beatMap[likelyEnemyMove] ?: error("")
