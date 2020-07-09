@@ -102,10 +102,11 @@ class MyBot : Bot {
 
         // Give precedence to recent values
         for (i in 0 until upperBound) {
-            if (player == 1 && prevGameRev[i].p1 == currentGameRev[i].p1) total += historyLength - i
-            if (player == 2 && prevGameRev[i].p2 == currentGameRev[i].p2) total += historyLength - i
+            val inc = historyLength - i
+            if (player == 1 && prevGameRev[i].p1 == currentGameRev[i].p1) total += inc
+            if (player == 2 && prevGameRev[i].p2 == currentGameRev[i].p2) total += inc
             // If the players draw, this could also be a part of a pattern independent of what was thrown
-            if (prevGameRev[i].p1 == prevGameRev[i].p2 && currentGameRev[i].p1 == currentGameRev[i].p2) total += historyLength - i
+            if (prevGameRev[i].p1 == prevGameRev[i].p2 && currentGameRev[i].p1 == currentGameRev[i].p2) total += inc
         }
 
         return total
