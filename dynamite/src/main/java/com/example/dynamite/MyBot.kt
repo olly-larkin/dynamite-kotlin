@@ -13,10 +13,9 @@ class MyBot : Bot {
         // Are you debugging?
         // Put a breakpoint in this method to see when we make a move
 
-
         val rounds = gamestate.rounds
 
-        val enemyMoveProbability = mutableMapOf(
+        val enemyMoveProbability1 = mutableMapOf(
             Move.R to 0.0,
             Move.P to 0.0,
             Move.S to 0.0,
@@ -24,11 +23,34 @@ class MyBot : Bot {
             Move.W to 0.0
         )
 
-        checkHistory(rounds, enemyMoveProbability)
+        val enemyMoveProbability2 = mutableMapOf(
+            Move.R to 0.0,
+            Move.P to 0.0,
+            Move.S to 0.0,
+            Move.D to 0.0,
+            Move.W to 0.0
+        )
 
-        val mostLikely = enemyMoveProbability.maxBy{ it.value }
-        val likelyEnemyMove = mostLikely?.key ?: Move.R
-        val moveScore = (mostLikely?.value ?: 0.0) / enemyMoveProbability.map{ it.value }.sum()
+        checkHistory(1, rounds, enemyMoveProbability1)
+        checkHistory(2, rounds, enemyMoveProbability2)
+
+        val mostLikely1 = enemyMoveProbability1.maxBy{ it.value }
+        val likelyEnemyMove1 = mostLikely1?.key ?: Move.R
+        val moveScore1 = (mostLikely1?.value ?: 0.0) / enemyMoveProbability1.map{ it.value }.sum()
+
+        val mostLikely2 = enemyMoveProbability2.maxBy{ it.value }
+        val likelyEnemyMove2 = mostLikely2?.key ?: Move.R
+        val moveScore2 = (mostLikely2?.value ?: 0.0) / enemyMoveProbability2.map{ it.value }.sum()
+
+        val likelyEnemyMove: Move
+        val moveScore: Double
+        if (moveScore1 > moveScore2) {
+            likelyEnemyMove = likelyEnemyMove1
+            moveScore = moveScore1
+        } else {
+            likelyEnemyMove = likelyEnemyMove2
+            moveScore = moveScore2
+        }
 
         val counterMove = beatMap[likelyEnemyMove] ?: error("")
 
@@ -36,7 +58,7 @@ class MyBot : Bot {
         val randomMoveLst = mutableListOf(Move.D, counterMove)
         randomMoveLst.shuffle()
 
-        return if (lastRoundDraw && moveScore <= 0.5)
+        return if (lastRoundDraw && moveScore < 0.5)
             move(randomMoveLst[0])
         else
             move(counterMove)
@@ -69,7 +91,7 @@ class MyBot : Bot {
         return m
     }
 
-    private fun scoreHistory(prevGame: List<Round>, currentGame: List<Round>) : Int {
+    private fun scoreHistory(player: Int, prevGame: List<Round>, currentGame: List<Round>) : Int {
         // reverse the lists because if one list is not full, we want to use the end of the other
         val prevGameRev = prevGame.asReversed()
         val currentGameRev = currentGame.asReversed()
@@ -80,8 +102,8 @@ class MyBot : Bot {
 
         // Give precedence to recent values
         for (i in 0 until upperBound) {
-            if (prevGameRev[i].p1 == currentGameRev[i].p1) total += historyLength - i
-            if (prevGameRev[i].p2 == currentGameRev[i].p2) total += historyLength - i
+            if (player == 1 && prevGameRev[i].p1 == currentGameRev[i].p1) total += historyLength - i
+            if (player == 2 && prevGameRev[i].p2 == currentGameRev[i].p2) total += historyLength - i
             // If the players draw, this could also be a part of a pattern independent of what was thrown
             if (prevGameRev[i].p1 == prevGameRev[i].p2 && currentGameRev[i].p1 == currentGameRev[i].p2) total += historyLength - i
         }
@@ -89,14 +111,14 @@ class MyBot : Bot {
         return total
     }
 
-    private fun checkHistory(rounds: List<Round>, outMap: MutableMap<Move, Double>) {
+    private fun checkHistory(player: Int, rounds: List<Round>, outMap: MutableMap<Move, Double>) {
         var idx = rounds.size
         if (idx <= 0) return
         val currentSession = rounds.subList(max(idx - historyLength, 0), idx)
         for (i in idx-1 downTo 1) {
             val enemyMove = rounds[i].p2
             val previousSession = rounds.subList(max(i - historyLength, 0), i)
-            val score = scoreHistory(previousSession, currentSession) * i
+            val score = scoreHistory(player, previousSession, currentSession) * i
             outMap[enemyMove] = (outMap[enemyMove] ?: 0.0) + score
         }
     }
