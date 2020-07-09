@@ -81,7 +81,7 @@ class MyBot : Bot {
         // Give precedence to recent values
         for (i in 0 until upperBound) {
             if (prevGameRev[i].p1 == currentGameRev[i].p1) total += upperBound - i
-//            if (prevGameRev[i].p2 == currentGameRev[i].p2) total += upperBound - i
+            if (prevGameRev[i].p2 == currentGameRev[i].p2) total += upperBound - i
             // If the players draw, this could also be a part of a pattern independent of what was thrown
             if (prevGameRev[i].p1 == prevGameRev[i].p2 && currentGameRev[i].p1 == currentGameRev[i].p2) total += upperBound - i
         }
