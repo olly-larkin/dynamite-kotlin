@@ -70,7 +70,7 @@ class MyBot : Bot {
         println("Started new match")
     }
 
-    private val historyLength = 5
+    private val historyLength = 2
     private var dynamiteLeft = 100
 
     private val beatMap = mapOf(
