@@ -4,6 +4,7 @@ import com.softwire.dynamite.bot.Bot
 import com.softwire.dynamite.game.Gamestate
 import com.softwire.dynamite.game.Move
 import com.softwire.dynamite.game.Round
+import java.util.Map
 import kotlin.math.max
 import kotlin.math.min
 
@@ -13,24 +14,33 @@ class MyBot : Bot {
         // Are you debugging?
         // Put a breakpoint in this method to see when we make a move
 
-        val historyLength = 100
 
         val rounds = gamestate.rounds
 
         val enemyMoveProbability = mutableMapOf(
-            Move.R to 0,
-            Move.P to 0,
-            Move.S to 0,
-            Move.D to 0,
-            Move.W to 0
+            Move.R to 0.0,
+            Move.P to 0.0,
+            Move.S to 0.0,
+            Move.D to 0.0,
+            Move.W to 0.0
         )
 
-        checkHistory(historyLength, rounds, enemyMoveProbability)
+        checkHistory(rounds, enemyMoveProbability)
 
-        val likelyEnemyMove = enemyMoveProbability.maxBy{ it.value }?.key ?: Move.R
+        val mostLikely = enemyMoveProbability.maxBy{ it.value }
+        val likelyEnemyMove = mostLikely?.key ?: Move.R
+        val moveScore = (mostLikely?.value ?: 0.0) / enemyMoveProbability.map{ it.value }.sum()
+
         val counterMove = beatMap[likelyEnemyMove] ?: error("")
 
-        return move(counterMove)
+        val lastRoundDraw = if (rounds.isEmpty()) false else (rounds.last().p1 == rounds.last().p2)
+        val randomMoveLst = mutableListOf(Move.D, counterMove)
+        randomMoveLst.shuffle()
+
+        return if (lastRoundDraw && moveScore <= 0.5)
+            move(randomMoveLst[0])
+        else
+            move(counterMove)
     }
 
     init {
@@ -39,6 +49,7 @@ class MyBot : Bot {
         println("Started new match")
     }
 
+    private val historyLength = 10
     private var dynamiteLeft = 100
 
     private val beatMap = mapOf(
@@ -50,11 +61,12 @@ class MyBot : Bot {
     )
 
     private fun move(m: Move) : Move {
-        if (m == Move.D)
+        if (m == Move.D) {
             // safeguard against using too many dynamite
             if (dynamiteLeft <= 0)
                 return Move.R
             dynamiteLeft -= 1
+        }
         return m
     }
 
@@ -78,15 +90,15 @@ class MyBot : Bot {
         return total
     }
 
-    private fun checkHistory(histLength: Int, rounds: List<Round>, outMap: MutableMap<Move, Int>) {
+    private fun checkHistory(rounds: List<Round>, outMap: MutableMap<Move, Double>) {
         var idx = rounds.size
         if (idx <= 0) return
-        val currentSession = rounds.subList(max(idx - histLength, 0), idx)
+        val currentSession = rounds.subList(max(idx - historyLength, 0), idx)
         for (i in idx-1 downTo 1) {
             val enemyMove = rounds[i].p2
-            val previousSession = rounds.subList(max(i - histLength, 0), i)
+            val previousSession = rounds.subList(max(i - historyLength, 0), i)
             val score = scoreHistory(previousSession, currentSession)
-            outMap[enemyMove] = (outMap[enemyMove] ?: 0) + score
+            outMap[enemyMove] = (outMap[enemyMove] ?: 0.0) + score
         }
     }
 }
