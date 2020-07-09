@@ -7,7 +7,6 @@ import com.softwire.dynamite.game.Round
 import kotlin.math.max
 import kotlin.math.min
 
-
 class MyBot : Bot {
 
     override fun makeMove(gamestate: Gamestate): Move {
