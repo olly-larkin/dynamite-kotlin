@@ -96,7 +96,7 @@ class MyBot : Bot {
         for (i in idx-1 downTo 1) {
             val enemyMove = rounds[i].p2
             val previousSession = rounds.subList(max(i - historyLength, 0), i)
-            val score = scoreHistory(previousSession, currentSession)
+            val score = scoreHistory(previousSession, currentSession) * i
             outMap[enemyMove] = (outMap[enemyMove] ?: 0.0) + score
         }
     }
