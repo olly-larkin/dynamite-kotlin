@@ -112,7 +112,7 @@ class MyBot : Bot {
     }
 
     private fun checkHistory(player: Int, rounds: List<Round>, outMap: MutableMap<Move, Double>) {
-        var idx = rounds.size
+        val idx = rounds.size
         if (idx <= 0) return
         val currentSession = rounds.subList(max(idx - historyLength, 0), idx)
         for (i in idx-1 downTo 1) {
